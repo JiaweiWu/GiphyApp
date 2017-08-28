@@ -4,6 +4,7 @@ import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 import com.jwu5.giphyapp.GiphyFragment;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -12,16 +13,16 @@ import java.util.List;
 public class Datum {
     @SerializedName("data")
     @Expose
-    private List<GiphyModel> data = null;
+    private ArrayList<GiphyModel> data = null;
     @SerializedName("pagination")
     @Expose
     private Pagination pagination;
 
-    public List<GiphyModel> getData() {
+    public ArrayList<GiphyModel> getData() {
         return data;
     }
 
-    public void setData(List<GiphyModel> data) {
+    public void setData(ArrayList<GiphyModel> data) {
         this.data = data;
     }
 

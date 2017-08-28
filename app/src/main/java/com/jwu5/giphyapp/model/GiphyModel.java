@@ -3,10 +3,13 @@ package com.jwu5.giphyapp.model;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
+import java.io.Serializable;
+
 /**
  * Created by Jiawei on 8/17/2017.
  */
-public class GiphyModel {
+public class GiphyModel implements Serializable {
+    public static final String PREVIEW_URL = "https://i.giphy.com/media/";
     @SerializedName("type")
     @Expose
     private String type;
@@ -34,7 +37,7 @@ public class GiphyModel {
     }
 
     public String getUrl() {
-        return url;
+        return PREVIEW_URL + id + "/200w.gif";
     }
 
     public void setUrl(String url) {
