@@ -19,17 +19,29 @@ import com.jwu5.giphyapp.model.GiphyModel;
 
 public class GiphyViewHolder extends RecyclerView.ViewHolder{
     private ImageView mItemImageView;
-    public ImageButton mFavoriteButton;
+    private ImageButton mFavoriteButton;
     private Context mContext;
+    private GiphyRecyclerViewAdapter mAdapter;
 
-    public GiphyViewHolder(View itemView, Context context) {
-            super(itemView);
-            mContext = context;
-            mItemImageView = (ImageView)itemView.findViewById(R.id.Giphy_image_view);
-            mFavoriteButton = (ImageButton)itemView.findViewById(R.id.Giphy_image_button);
+    final private int PINK = Color.argb(255, 255, 102, 153);
+    final private int WHITE = Color.WHITE;
+
+    public GiphyViewHolder(View itemView, Context context, GiphyRecyclerViewAdapter adapter) {
+        super(itemView);
+        mContext = context;
+        mItemImageView = (ImageView)itemView.findViewById(R.id.Giphy_image_view);
+        mFavoriteButton = (ImageButton)itemView.findViewById(R.id.Giphy_image_button);
+        mAdapter = adapter;
     }
 
     public void bindGiphyItem(final GiphyModel item) {
+        final MainActivity activity = (MainActivity) mContext;
+        if(activity.getFavorites().containsKey(item.getId())) {
+            mFavoriteButton.setColorFilter(PINK);
+        } else {
+            mFavoriteButton.setColorFilter(WHITE);
+        }
+
         Glide
                 .with(mContext)
                 .load(item.getUrl())
@@ -39,9 +51,14 @@ public class GiphyViewHolder extends RecyclerView.ViewHolder{
         mFavoriteButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                MainActivity context = (MainActivity) mContext;
-                context.addFavorite(item);
-                mFavoriteButton.setColorFilter(Color.argb(255, 255, 102, 153));
+                if (activity.getFavorites().containsKey(item.getId())) {
+                    activity.removeFavorites(item);
+                    mFavoriteButton.setColorFilter(WHITE);
+                } else {
+                    activity.addFavorite(item);
+                    mFavoriteButton.setColorFilter(PINK);
+                }
+                mAdapter.notifyItemChanged(getAdapterPosition());
             }
         });
     }

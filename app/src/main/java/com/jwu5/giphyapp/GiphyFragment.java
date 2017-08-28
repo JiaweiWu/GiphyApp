@@ -124,4 +124,10 @@ public class GiphyFragment extends Fragment {
             mGiphyRecyclerView.setAdapter(new GiphyRecyclerViewAdapter(mItems, getActivity()));
         }
     }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        setupAdapter();
+    }
 }

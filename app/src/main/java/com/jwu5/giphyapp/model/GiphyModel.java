@@ -8,7 +8,7 @@ import java.io.Serializable;
 /**
  * Created by Jiawei on 8/17/2017.
  */
-public class GiphyModel implements Serializable {
+public class GiphyModel {
     public static final String PREVIEW_URL = "https://i.giphy.com/media/";
     @SerializedName("type")
     @Expose

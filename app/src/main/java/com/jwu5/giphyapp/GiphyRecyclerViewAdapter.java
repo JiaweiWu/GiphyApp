@@ -6,9 +6,12 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.bumptech.glide.gifdecoder.GifHeader;
 import com.jwu5.giphyapp.model.GiphyModel;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -29,7 +32,7 @@ public class GiphyRecyclerViewAdapter extends RecyclerView.Adapter<GiphyViewHold
         LayoutInflater inflater = LayoutInflater.from(mContext);
         View view = inflater.inflate(R.layout.giphy_item, viewGroup, false);
 
-        return new GiphyViewHolder(view, mContext);
+        return new GiphyViewHolder(view, mContext, this);
     }
 
     @Override
@@ -41,10 +44,5 @@ public class GiphyRecyclerViewAdapter extends RecyclerView.Adapter<GiphyViewHold
     @Override
     public int getItemCount() {
         return mGiphyItems.size();
-    }
-
-    public void addItem(GiphyModel item) {
-        mGiphyItems.add(item);
-        notifyDataSetChanged();
     }
 }

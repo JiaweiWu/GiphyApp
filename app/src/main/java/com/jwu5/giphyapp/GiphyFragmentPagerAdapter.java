@@ -24,15 +24,10 @@ public class GiphyFragmentPagerAdapter extends FragmentPagerAdapter {
     private FragmentManager mFragmentManager;
     private Map<Integer, String> mFragmentTags;
 
-    private Context mContext;
-    private ArrayList<GiphyModel> mFavorites;
-
-    public GiphyFragmentPagerAdapter(FragmentManager fm, Context context, ArrayList<GiphyModel> favorites) {
+    public GiphyFragmentPagerAdapter(FragmentManager fm) {
         super(fm);
         mFragmentManager = fm;
         mFragmentTags = new HashMap<>();
-        mContext = context;
-        mFavorites = favorites;
     }
 
     @Override

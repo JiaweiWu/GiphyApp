@@ -24,6 +24,8 @@ import java.io.OutputStreamWriter;
 import java.lang.reflect.Type;
 import java.nio.Buffer;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 
 /*
@@ -59,20 +61,20 @@ Add pagination (infinite scrolling) to the gif lists.
 
 public class MainActivity extends AppCompatActivity {
     private static final String FILENAME = "file.sav";
-    private ArrayList<GiphyModel> mFavorites;
+    private LinkedHashMap<String, GiphyModel> mFavorites;
     private GiphyFragmentPagerAdapter mGiphyFragmentPagerAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        mFavorites = new ArrayList<>();
+        mFavorites = new LinkedHashMap<>();
         setContentView(R.layout.activity_main);
 
         Toolbar toolbar = (Toolbar)findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        mGiphyFragmentPagerAdapter = new GiphyFragmentPagerAdapter(getSupportFragmentManager(), MainActivity.this, mFavorites);
+        mGiphyFragmentPagerAdapter = new GiphyFragmentPagerAdapter(getSupportFragmentManager());
         ViewPager viewPager = (ViewPager) findViewById(R.id.main_activity_view_pager);
         viewPager.setAdapter(mGiphyFragmentPagerAdapter);
         viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
@@ -123,7 +125,7 @@ public class MainActivity extends AppCompatActivity {
             BufferedReader in = new BufferedReader(new InputStreamReader(fis));
 
             Gson gson = new Gson();
-            Type listType = new TypeToken<List<GiphyModel>>() {}.getType();
+            Type listType = new TypeToken<LinkedHashMap<String, GiphyModel>>() {}.getType();
 
             mFavorites = gson.fromJson(in, listType);
         } catch (FileNotFoundException e) {
@@ -131,12 +133,16 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    public void addFavorite(GiphyModel item) {
-        mFavorites.add(item);
+    public LinkedHashMap<String, GiphyModel> getFavorites() {
+        return mFavorites;
     }
 
-    public ArrayList<GiphyModel> getFavorites() {
-        return mFavorites;
+    public void addFavorite(GiphyModel item) {
+        mFavorites.put(item.getId(), item);
+    }
+
+    public void removeFavorites(GiphyModel item) {
+        mFavorites.remove(item.getId());
     }
 
     @Override

@@ -11,12 +11,15 @@ import android.view.ViewGroup;
 import com.jwu5.giphyapp.model.GiphyModel;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.Set;
 
 /**
  * Created by Jiawei on 8/15/2017.
  */
 public class FavoritesFragment extends Fragment {
-    private ArrayList<GiphyModel> mFavorites;
+    private LinkedHashMap<String, GiphyModel> mFavorites;
     private RecyclerView mGiphyRecyclerView;
     public GiphyRecyclerViewAdapter mGiphyRecyclerViewAdapter;
 
@@ -27,7 +30,7 @@ public class FavoritesFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mFavorites = new ArrayList<>();
+        mFavorites = new LinkedHashMap<>();
     }
 
     @Override
@@ -36,7 +39,6 @@ public class FavoritesFragment extends Fragment {
 
         mGiphyRecyclerView = (RecyclerView)v.findViewById(R.id.fragment_giphy_view_recycler_view);
         mGiphyRecyclerView.setLayoutManager(new GridLayoutManager(getActivity(), 2));
-
         UpdateUI();
         return v;
     }
@@ -49,7 +51,13 @@ public class FavoritesFragment extends Fragment {
     }
 
     public void UpdateUI() {
-        mGiphyRecyclerViewAdapter = new GiphyRecyclerViewAdapter(mFavorites, getActivity());
+        ArrayList<GiphyModel> tempList = new ArrayList<>();
+        Set<String> keys = mFavorites.keySet();
+
+        for (String k : keys) {
+            tempList.add(mFavorites.get(k));
+        }
+        mGiphyRecyclerViewAdapter = new GiphyRecyclerViewAdapter(tempList, getActivity());
         mGiphyRecyclerView.setAdapter(mGiphyRecyclerViewAdapter);
     }
 }
