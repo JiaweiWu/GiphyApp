@@ -12,11 +12,14 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 
 import com.jwu5.giphyapp.model.Datum;
 import com.jwu5.giphyapp.model.GiphyModel;
 
 import java.util.ArrayList;
+
+import io.reactivex.Observable;
 import io.reactivex.Observer;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.annotations.NonNull;
@@ -30,6 +33,13 @@ public class GiphyFragment extends Fragment {
     private RecyclerView mGiphyRecyclerView;
     private ArrayList<GiphyModel> mItems = new ArrayList<>();
     private GiphyNetworkRequest mGiphyNetworkRequest;
+    private GridLayoutManager mGridLayoutManager;
+    private GiphyRecyclerViewAdapter mGiphyRecyclerViewAdapter;
+    private boolean trending = true;
+    private String mQuery = null;
+    private SearchView mSearchView;
+
+    private boolean isLoading = false;
 
     public static GiphyFragment newInstance() {
         return new GiphyFragment();
@@ -42,30 +52,7 @@ public class GiphyFragment extends Fragment {
         setHasOptionsMenu(true);
 
         mGiphyNetworkRequest = new GiphyNetworkRequest("https://api.giphy.com/v1/gifs/");
-
-        mGiphyNetworkRequest.getTrending(12, 0)
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribe(new Observer<Datum>() {
-                @Override
-                public void onSubscribe(@NonNull Disposable d) {
-
-                }
-                @Override
-                public void onNext(@NonNull Datum datum) {
-                    mItems = datum.getData();
-                    setupAdapter();
-                }
-                @Override
-                public void onError(@NonNull Throwable e) {
-                    e.printStackTrace();
-                    Log.e(TAG, TAG + ": Error");
-                }
-                @Override
-                public void onComplete() {
-                    Log.d(TAG, TAG + ": Complete");
-                }
-            });
+        mGiphyRecyclerViewAdapter = new GiphyRecyclerViewAdapter(mItems, getActivity());
     }
 
     @Override
@@ -73,11 +60,30 @@ public class GiphyFragment extends Fragment {
         View v = inflater.inflate(R.layout.fragment_giphy_view, container, false);
 
         mGiphyRecyclerView = (RecyclerView)v.findViewById(R.id.fragment_giphy_view_recycler_view);
-        mGiphyRecyclerView.setLayoutManager(new GridLayoutManager(getActivity(), 2));
+        mGridLayoutManager = new GridLayoutManager(getActivity(), 2);
+        mGiphyRecyclerView.setLayoutManager(mGridLayoutManager);
+        mGiphyRecyclerView.setAdapter(mGiphyRecyclerViewAdapter);
 
+        mGiphyRecyclerView.addOnScrollListener(new PaginationScrollListener(mGridLayoutManager) {
+            @Override
+            public void onLoadMore(int totalItemCount) {
+                if (!isLoading) {
+                    if(trending) {
+                        makeGiphyNetworkCall(mGiphyNetworkRequest.getTrending(6, totalItemCount));
+                    } else {
+                        makeGiphyNetworkCall(mGiphyNetworkRequest.getSearchedGifs(mQuery, 6, totalItemCount));
+                    }
+                }
+            }
+        });
         return v;
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        mGiphyRecyclerViewAdapter.notifyDataSetChanged();
+    }
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater menuInflater) {
@@ -85,32 +91,23 @@ public class GiphyFragment extends Fragment {
         menuInflater.inflate(R.menu.fragment_giphy_view, menu);
 
         MenuItem searchItem = menu.findItem(R.id.menu_item_search);
-        final SearchView searchView = (SearchView) searchItem.getActionView();
+        mSearchView = (SearchView) searchItem.getActionView();
 
-        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+        makeGiphyNetworkCall(mGiphyNetworkRequest.getTrending(6, 0));
+
+        mSearchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String s) {
-                Log.d(TAG, "THIS IS THE STRING: " + s);
                 String result = s.trim().replaceAll(" ", "-").toLowerCase();
-                mGiphyNetworkRequest.getSearchedGifs(result, 12, 0)
-                        .subscribeOn(Schedulers.io())
-                        .observeOn(AndroidSchedulers.mainThread())
-                        .subscribe(new Observer<Datum>() {
-                                       @Override
-                                       public void onSubscribe(@NonNull Disposable d) {}
-                                       @Override
-                                       public void onNext(@NonNull Datum datum) {
-                                           mItems = datum.getData();
-                                           setupAdapter();
-                                       }
-                                       @Override
-                                       public void onError(@NonNull Throwable e) {}
-                                       @Override
-                                       public void onComplete() {}
-                                   });
-                                searchView.clearFocus();
+                mGiphyRecyclerViewAdapter.removeAll();
+                mQuery = s;
+                trending = false;
+                makeGiphyNetworkCall(mGiphyNetworkRequest.getSearchedGifs(result, 6, 0));
+
+                mSearchView.clearFocus();
                 return true;
             }
+
             @Override
             public boolean onQueryTextChange(String s) {
                 return false;
@@ -118,16 +115,49 @@ public class GiphyFragment extends Fragment {
         });
     }
 
-
-    private void setupAdapter() {
-        if (isAdded()) {
-            mGiphyRecyclerView.setAdapter(new GiphyRecyclerViewAdapter(mItems, getActivity()));
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch(item.getItemId()) {
+            case R.id.menu_item_clear:
+                if(!trending) {
+                    mSearchView.setQuery("", false);
+                    mSearchView.setIconified(true);
+                    trending = true;
+                    mGiphyRecyclerViewAdapter.removeAll();
+                    makeGiphyNetworkCall(mGiphyNetworkRequest.getTrending(6, 0));
+                    return true;
+                } else {
+                    return true;
+                }
+            default:
+                return super.onOptionsItemSelected(item);
         }
     }
 
-    @Override
-    public void onResume() {
-        super.onResume();
-        setupAdapter();
+
+    private void makeGiphyNetworkCall(Observable<Datum> observable) {
+        observable
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Observer<Datum>() {
+                    @Override
+                    public void onSubscribe(@NonNull Disposable d) {
+                        isLoading = true;
+                    }
+                    @Override
+                    public void onNext(@NonNull Datum datum) {
+                        mGiphyRecyclerViewAdapter.addItems(datum.getData());
+                    }
+                    @Override
+                    public void onError(@NonNull Throwable e) {
+                        e.printStackTrace();
+                        Log.e(TAG, TAG + ": Error");
+                    }
+                    @Override
+                    public void onComplete() {
+                        isLoading = false;
+                        Log.d(TAG, TAG + ": Complete");
+                    }
+                });
     }
 }

@@ -19,8 +19,12 @@ import java.util.List;
  */
 
 public class GiphyRecyclerViewAdapter extends RecyclerView.Adapter<GiphyViewHolder>{
+    private static final int ITEM = 0;
+    private static final int LOADING = 1;
+
     private ArrayList<GiphyModel> mGiphyItems;
     private Context mContext;
+    private boolean isLoadingAdded = false;
 
     public GiphyRecyclerViewAdapter(ArrayList<GiphyModel> giphyItems, Context context) {
         mGiphyItems = giphyItems;
@@ -42,7 +46,23 @@ public class GiphyRecyclerViewAdapter extends RecyclerView.Adapter<GiphyViewHold
     }
 
     @Override
+    public int getItemViewType(int position) {
+        return (position == mGiphyItems.size() - 1 && isLoadingAdded) ? LOADING : ITEM;
+    }
+
+    @Override
     public int getItemCount() {
         return mGiphyItems.size();
     }
+
+    public void addItems(ArrayList<GiphyModel> items) {
+        mGiphyItems.addAll(items);
+        notifyDataSetChanged();
+    }
+
+    public void removeAll() {
+        mGiphyItems = new ArrayList<>();
+        notifyDataSetChanged();
+    }
+
 }

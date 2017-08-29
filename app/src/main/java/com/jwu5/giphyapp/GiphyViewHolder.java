@@ -35,18 +35,18 @@ public class GiphyViewHolder extends RecyclerView.ViewHolder{
     }
 
     public void bindGiphyItem(final GiphyModel item) {
+        Glide
+                .with(mContext)
+                .load(item.getUrl())
+                .diskCacheStrategy(DiskCacheStrategy.SOURCE)
+                .into(mItemImageView);
+
         final MainActivity activity = (MainActivity) mContext;
         if(activity.getFavorites().containsKey(item.getId())) {
             mFavoriteButton.setColorFilter(PINK);
         } else {
             mFavoriteButton.setColorFilter(WHITE);
         }
-
-        Glide
-                .with(mContext)
-                .load(item.getUrl())
-                .diskCacheStrategy(DiskCacheStrategy.SOURCE)
-                .into(mItemImageView);
 
         mFavoriteButton.setOnClickListener(new View.OnClickListener() {
             @Override
