@@ -12,13 +12,11 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 
 import com.jwu5.giphyapp.model.Datum;
 import com.jwu5.giphyapp.model.GiphyModel;
 
 import java.util.ArrayList;
-import java.util.concurrent.TimeUnit;
 
 import io.reactivex.Observable;
 import io.reactivex.Observer;
@@ -65,6 +63,10 @@ public class GiphyFragment extends Fragment {
         mGiphyRecyclerView.setLayoutManager(mGridLayoutManager);
         mGiphyRecyclerView.setAdapter(mGiphyRecyclerViewAdapter);
 
+        if (trending) {
+            makeGiphyNetworkCall(mGiphyNetworkRequest.getTrending(6, 0));
+        }
+
         mGiphyRecyclerView.addOnScrollListener(new PaginationScrollListener(mGridLayoutManager) {
             @Override
             public void onLoadMore(int totalItemCount) {
@@ -94,7 +96,7 @@ public class GiphyFragment extends Fragment {
         MenuItem searchItem = menu.findItem(R.id.menu_item_search);
         mSearchView = (SearchView) searchItem.getActionView();
 
-        makeGiphyNetworkCall(mGiphyNetworkRequest.getTrending(6, 0));
+
 
         mSearchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
