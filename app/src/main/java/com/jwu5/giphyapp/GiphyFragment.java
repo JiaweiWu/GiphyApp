@@ -18,6 +18,7 @@ import com.jwu5.giphyapp.model.Datum;
 import com.jwu5.giphyapp.model.GiphyModel;
 
 import java.util.ArrayList;
+import java.util.concurrent.TimeUnit;
 
 import io.reactivex.Observable;
 import io.reactivex.Observer;
@@ -151,7 +152,7 @@ public class GiphyFragment extends Fragment {
                     @Override
                     public void onError(@NonNull Throwable e) {
                         e.printStackTrace();
-                        Log.e(TAG, TAG + ": Error");
+                        Log.e(TAG, TAG + e);
                     }
                     @Override
                     public void onComplete() {

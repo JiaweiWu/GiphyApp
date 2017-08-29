@@ -5,6 +5,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ProgressBar;
 
 import com.bumptech.glide.gifdecoder.GifHeader;
 import com.jwu5.giphyapp.model.GiphyModel;
@@ -62,6 +63,11 @@ public class GiphyRecyclerViewAdapter extends RecyclerView.Adapter<GiphyViewHold
 
     public void removeAll() {
         mGiphyItems = new ArrayList<>();
+        notifyDataSetChanged();
+    }
+
+    public void removeItem(GiphyModel item) {
+        mGiphyItems.remove(item);
         notifyDataSetChanged();
     }
 

@@ -4,6 +4,13 @@
     android:layout_width="180dp"
     android:layout_height="180dp">
 
+    <ProgressBar
+        android:id="@+id/progress_bar"
+        android:visibility="visible"
+        android:layout_width="80dp"
+        android:layout_height="80dp"
+        android:layout_gravity="center"/>
+
     <ImageView
         xmlns:android="http://schemas.android.com/apk/res/android"
         android:id="@+id/Giphy_image_view"
