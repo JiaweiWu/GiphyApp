@@ -39,6 +39,7 @@ object utils {
     }
 
     fun loadFromFile(filename: String, context: Context): LinkedHashMap<String, GiphyModel>? {
+        var tempFavorites = LinkedHashMap<String, GiphyModel>()
         try {
             val fis = context.openFileInput(filename)
             val `in` = BufferedReader(InputStreamReader(fis))
@@ -53,6 +54,6 @@ object utils {
             e.printStackTrace()
         }
 
-        return null
+        return tempFavorites
     }
 }
