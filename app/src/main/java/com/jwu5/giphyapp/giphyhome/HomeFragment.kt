@@ -12,6 +12,7 @@ import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ProgressBar
 
 import com.jwu5.giphyapp.adapters.GiphyRecyclerViewAdapter
 import com.jwu5.giphyapp.R
@@ -27,6 +28,7 @@ class HomeFragment : Fragment(), HomeView {
 
     private var mQuery: String? = null
     private var mSearchView: SearchView? = null
+    private var mProgressBar: ProgressBar? = null
 
     private var isLoading = false
     private var trending = true
@@ -56,6 +58,7 @@ class HomeFragment : Fragment(), HomeView {
         mGridLayoutManager = GridLayoutManager(activity, 2)
         mGiphyRecyclerView!!.layoutManager = mGridLayoutManager
         mGiphyRecyclerView!!.adapter = mGiphyRecyclerViewAdapter
+        mProgressBar = v.findViewById(R.id.fragment_progress_bar) as ProgressBar
 
         if (trending) {
             mHomePresenter!!.getTrendingList(LIMIT, 0)
@@ -128,10 +131,12 @@ class HomeFragment : Fragment(), HomeView {
     }
 
     override fun setLoading() {
+        mProgressBar!!.visibility = ProgressBar.VISIBLE
         isLoading = true
     }
 
     override fun setLoadingComplete() {
+        mProgressBar!!.visibility = ProgressBar.INVISIBLE
         isLoading = false
     }
 
