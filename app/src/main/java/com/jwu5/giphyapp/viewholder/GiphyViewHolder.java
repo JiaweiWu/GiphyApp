@@ -1,43 +1,45 @@
-package com.jwu5.giphyapp;
+package com.jwu5.giphyapp.viewholder;
 
 import android.content.Context;
-import android.graphics.Color;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
-import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
-import com.bumptech.glide.load.engine.cache.MemoryCache;
 import com.bumptech.glide.load.resource.drawable.GlideDrawable;
 import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.target.Target;
-import com.jwu5.giphyapp.model.GiphyModel;
+import com.jwu5.giphyapp.adapters.GiphyRecyclerViewAdapter;
+import com.jwu5.giphyapp.R;
+import com.jwu5.giphyapp.network.model.GiphyModel;
 
 /**
  * Created by Jiawei on 8/16/2017.
  */
 
-public class GiphyViewHolder extends RecyclerView.ViewHolder{
+public class GiphyViewHolder extends RecyclerView.ViewHolder implements ViewHolderView{
     private ImageView mItemImageView;
     private ImageButton mFavoriteButton;
     private ProgressBar mProgressBar;
     private Context mContext;
     private GiphyRecyclerViewAdapter mAdapter;
+    private String TAG;
 
-    final private int PINK = Color.argb(255, 255, 102, 153);
-    final private int WHITE = Color.WHITE;
+    protected ViewHolderPresenter mViewHolderPresenter;
 
-    public GiphyViewHolder(View itemView, Context context, GiphyRecyclerViewAdapter adapter) {
+    public GiphyViewHolder(View itemView, Context context, GiphyRecyclerViewAdapter adapter, String tag) {
         super(itemView);
         mContext = context;
         mItemImageView = (ImageView)itemView.findViewById(R.id.Giphy_image_view);
         mProgressBar = (ProgressBar) itemView.findViewById(R.id.progress_bar);
         mFavoriteButton = (ImageButton)itemView.findViewById(R.id.Giphy_image_button);
         mAdapter = adapter;
+
+        TAG = tag;
+        mViewHolderPresenter = new ViewHolderPresenter(this, mContext);
     }
 
     public void bindGiphyItem(final GiphyModel item) {
@@ -60,28 +62,34 @@ public class GiphyViewHolder extends RecyclerView.ViewHolder{
                 .diskCacheStrategy(DiskCacheStrategy.SOURCE)
                 .into(mItemImageView);
 
-        final MainActivity activity = (MainActivity) mContext;
-        if(activity.getFavorites().containsKey(item.getId())) {
-            mFavoriteButton.setColorFilter(PINK);
-        } else {
-            mFavoriteButton.setColorFilter(WHITE);
-        }
+        mViewHolderPresenter.setFavoriteIcon(item);
 
         mFavoriteButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (activity.getFavorites().containsKey(item.getId())) {
-                    activity.removeFavorites(item);
-                    mAdapter.removeItem(item);
-                    mFavoriteButton.setColorFilter(WHITE);
-                    Toast.makeText(activity, "Removed From Favorites", Toast.LENGTH_SHORT).show();
-                } else {
-                    activity.addFavorite(item);
-                    mFavoriteButton.setColorFilter(PINK);
-                    Toast.makeText(activity, "Added to Favorites", Toast.LENGTH_SHORT).show();
-                }
-                mAdapter.notifyItemChanged(getAdapterPosition());
+                mViewHolderPresenter.saveToFavorites(item);
             }
         });
     }
+
+    @Override
+    public void setButtonColor(int color) {
+        mFavoriteButton.setColorFilter(color);
+    }
+
+    @Override
+    public void removeItemFromView(GiphyModel item) {
+        mAdapter.removeItem(item);
+    }
+
+    @Override
+    public void updateAdapter() {
+        mAdapter.notifyItemChanged(getAdapterPosition());
+    }
+
+    @Override
+    public String getTag() {
+        return TAG;
+    }
+
 }

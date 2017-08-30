@@ -1,17 +1,14 @@
-package com.jwu5.giphyapp;
+package com.jwu5.giphyapp.adapters;
 
-import android.content.Context;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.view.ViewGroup;
 
-import com.jwu5.giphyapp.model.Datum;
-import com.jwu5.giphyapp.model.GiphyModel;
+import com.jwu5.giphyapp.giphyfavorites.FavoritesFragment;
+import com.jwu5.giphyapp.giphyhome.HomeFragment;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -20,7 +17,7 @@ import java.util.Map;
 public class GiphyFragmentPagerAdapter extends FragmentPagerAdapter {
 
     private final int PAGE_COUNT = 2;
-    private String tabTitles[] = new String[] {"Home", "Favorites"};
+    private String tabTitles[] = new String[] {HomeFragment.TAB_NAME, FavoritesFragment.TAB_NAME};
     private FragmentManager mFragmentManager;
     private Map<Integer, String> mFragmentTags;
 
@@ -38,7 +35,7 @@ public class GiphyFragmentPagerAdapter extends FragmentPagerAdapter {
     @Override
     public Fragment getItem(int position) {
         if(position == 0) {
-            return GiphyFragment.newInstance();
+            return HomeFragment.newInstance();
         }
         else {
             return FavoritesFragment.newInstance();

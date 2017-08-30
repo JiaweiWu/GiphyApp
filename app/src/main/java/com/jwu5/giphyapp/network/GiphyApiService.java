@@ -1,17 +1,16 @@
-package com.jwu5.giphyapp;
+package com.jwu5.giphyapp.network;
 
 
 
-import com.jwu5.giphyapp.model.Datum;
+import com.jwu5.giphyapp.network.model.Datum;
 import io.reactivex.Observable;
-import io.reactivex.internal.operators.observable.ObservableRange;
 import retrofit2.http.GET;
 import retrofit2.http.Query;
 
 /**
  * Created by Jiawei on 8/16/2017.
  */
-public interface GiphyService {
+public interface GiphyApiService {
 
     static final String API_KEY = "849d70e5f5f74406a34eee5530a250ec";
 

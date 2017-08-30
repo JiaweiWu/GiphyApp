@@ -6,27 +6,11 @@ import android.support.v4.view.ViewPager;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.view.Menu;
 
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
-import com.jwu5.giphyapp.model.Datum;
-import com.jwu5.giphyapp.model.GiphyModel;
-
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
-import java.lang.reflect.Type;
-import java.nio.Buffer;
-import java.util.ArrayList;
-import java.util.HashMap;
+import com.jwu5.giphyapp.adapters.GiphyFragmentPagerAdapter;
+import com.jwu5.giphyapp.dataSingleton.SavedFavorites;
+import com.jwu5.giphyapp.network.model.GiphyModel;
 import java.util.LinkedHashMap;
-import java.util.List;
 
 /*
 Freshworks Android Giphy Sample App
@@ -61,14 +45,11 @@ Add pagination (infinite scrolling) to the gif lists.
 
 public class MainActivity extends AppCompatActivity {
     private static final String FILENAME = "file.sav";
-    private LinkedHashMap<String, GiphyModel> mFavorites;
     private GiphyFragmentPagerAdapter mGiphyFragmentPagerAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        mFavorites = new LinkedHashMap<>();
         setContentView(R.layout.activity_main);
 
         Toolbar toolbar = (Toolbar)findViewById(R.id.toolbar);
@@ -100,54 +81,12 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
-        loadFromFile();
-    }
-
-    protected void saveInFile() {
-        try {
-            FileOutputStream fos = openFileOutput(FILENAME, 0);
-            BufferedWriter out = new BufferedWriter(new OutputStreamWriter(fos));
-
-            Gson gson = new Gson();
-            gson.toJson(mFavorites, out);
-            out.flush();
-            fos.close();
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    protected void loadFromFile() {
-        try {
-            FileInputStream fis = openFileInput(FILENAME);
-            BufferedReader in = new BufferedReader(new InputStreamReader(fis));
-
-            Gson gson = new Gson();
-            Type listType = new TypeToken<LinkedHashMap<String, GiphyModel>>() {}.getType();
-
-            mFavorites = gson.fromJson(in, listType);
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        }
-    }
-
-    public LinkedHashMap<String, GiphyModel> getFavorites() {
-        return mFavorites;
-    }
-
-    public void addFavorite(GiphyModel item) {
-        mFavorites.put(item.getId(), item);
-    }
-
-    public void removeFavorites(GiphyModel item) {
-        mFavorites.remove(item.getId());
+        SavedFavorites.getInstance().setFavorites(utils.loadFromFile(FILENAME, this));
     }
 
     @Override
     public void onPause() {
         super.onPause();
-        saveInFile();
+        utils.saveInFile(SavedFavorites.getInstance().getFavorites(), FILENAME, this);
     }
 }

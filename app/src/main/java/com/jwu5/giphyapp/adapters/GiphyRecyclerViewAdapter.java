@@ -1,54 +1,51 @@
-package com.jwu5.giphyapp;
+package com.jwu5.giphyapp.adapters;
 
 import android.content.Context;
+import android.content.res.Configuration;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ProgressBar;
 
-import com.bumptech.glide.gifdecoder.GifHeader;
-import com.jwu5.giphyapp.model.GiphyModel;
+import com.jwu5.giphyapp.R;
+import com.jwu5.giphyapp.network.model.GiphyModel;
+import com.jwu5.giphyapp.viewholder.GiphyViewHolder;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
 
 /**
  * Created by Jiawei on 8/16/2017.
  */
 
 public class GiphyRecyclerViewAdapter extends RecyclerView.Adapter<GiphyViewHolder>{
-    private static final int ITEM = 0;
-    private static final int LOADING = 1;
-
     private ArrayList<GiphyModel> mGiphyItems;
     private Context mContext;
-    private boolean isLoadingAdded = false;
+    private String TAG;
+    private int mOrientation;
 
-    public GiphyRecyclerViewAdapter(ArrayList<GiphyModel> giphyItems, Context context) {
-        mGiphyItems = giphyItems;
+    public GiphyRecyclerViewAdapter(Context context, String tag, int orientation) {
+        mGiphyItems = new ArrayList<>();
         mContext = context;
+        TAG = tag;
+        mOrientation = orientation;
     }
 
     @Override
     public GiphyViewHolder onCreateViewHolder(ViewGroup viewGroup, int viewType) {
         LayoutInflater inflater = LayoutInflater.from(mContext);
-        View view = inflater.inflate(R.layout.giphy_item, viewGroup, false);
-
-        return new GiphyViewHolder(view, mContext, this);
+        View view;
+        if (mOrientation == Configuration.ORIENTATION_LANDSCAPE) {
+            view = inflater.inflate(R.layout.giphy_item_land, viewGroup, false);
+        } else {
+            view = inflater.inflate(R.layout.giphy_item, viewGroup, false);
+        }
+        return new GiphyViewHolder(view, mContext, this, TAG);
     }
 
     @Override
     public void onBindViewHolder(GiphyViewHolder viewHolder, int position) {
         GiphyModel giphyItem = mGiphyItems.get(position);
         viewHolder.bindGiphyItem(giphyItem);
-    }
-
-    @Override
-    public int getItemViewType(int position) {
-        return (position == mGiphyItems.size() - 1 && isLoadingAdded) ? LOADING : ITEM;
     }
 
     @Override
@@ -69,6 +66,15 @@ public class GiphyRecyclerViewAdapter extends RecyclerView.Adapter<GiphyViewHold
     public void removeItem(GiphyModel item) {
         mGiphyItems.remove(item);
         notifyDataSetChanged();
+    }
+
+    public void setItemList(ArrayList<GiphyModel> itemList) {
+        mGiphyItems = itemList;
+        notifyDataSetChanged();
+    }
+
+    public ArrayList<GiphyModel> getItems() {
+        return mGiphyItems;
     }
 
 }

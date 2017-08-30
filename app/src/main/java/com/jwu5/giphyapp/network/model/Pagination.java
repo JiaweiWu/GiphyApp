@@ -1,4 +1,4 @@
-package com.jwu5.giphyapp.model;
+package com.jwu5.giphyapp.network.model;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;

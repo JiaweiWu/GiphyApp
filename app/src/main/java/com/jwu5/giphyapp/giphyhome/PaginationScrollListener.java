@@ -1,4 +1,4 @@
-package com.jwu5.giphyapp;
+package com.jwu5.giphyapp.giphyhome;
 
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -29,8 +29,6 @@ public abstract class PaginationScrollListener extends RecyclerView.OnScrollList
 
         if ((visibleItemCount + firstVisibleItem) >= totalItemCount)
         {
-            Log.d("", "Visible Count: " + visibleItemCount + " First Count: " + firstVisibleItem +
-                " Total Count: " + totalItemCount);
             onLoadMore(totalItemCount);
         }
     }

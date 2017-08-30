@@ -1,11 +1,9 @@
-package com.jwu5.giphyapp.model;
+package com.jwu5.giphyapp.network.model;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
-import com.jwu5.giphyapp.GiphyFragment;
 
 import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Created by Jiawei on 8/17/2017.
